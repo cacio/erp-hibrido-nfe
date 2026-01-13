@@ -1,0 +1,72 @@
+############################
+# Composer
+############################
+/vendor/
+composer.lock
+
+############################
+# Ambiente / Segurança
+############################
+.env
+.env.*
+!.env.example
+
+############################
+# Doctrine
+############################
+/var/cache/
+/var/log/
+/var/proxies/
+/var/doctrine/
+/migrations/*.php~
+
+############################
+# Cache, logs e temporários
+############################
+*.log
+logs/
+cache/
+tmp/
+temp/
+
+############################
+# Uploads (se não versionar)
+############################
+public/uploads/
+storage/
+
+############################
+# Docker
+############################
+docker-compose.override.yml
+.env.docker
+.env.docker.*
+
+############################
+# IDEs e editores
+############################
+.idea/
+.vscode/
+*.swp
+*.swo
+*.tmp
+
+############################
+# Sistema Operacional
+############################
+.DS_Store
+Thumbs.db
+
+############################
+# Testes
+############################
+phpunit.xml
+.phpunit.result.cache
+
+############################
+# Backup e dumps
+############################
+*.sql
+*.bak
+*.backup
+*.dump
