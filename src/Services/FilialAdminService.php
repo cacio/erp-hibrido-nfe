@@ -34,7 +34,7 @@ class FilialAdminService
         );
         $filial->setTipoUnidade($data['tipo_unidade']);
         $filial->setRazaoSocial($data['razao_social']);
-        $filial->setCnpj($data['cnpj']);
+        $filial->setCnpj(preg_replace('/[^\d]/', '', $data['cnpj']));
         $filial->setUf($data['uf']);
 
         $em->persist($filial);
@@ -52,7 +52,7 @@ class FilialAdminService
 
         $filial->setTipoUnidade($data['tipo_unidade']);
         $filial->setRazaoSocial($data['razao_social']);
-        $filial->setCnpj($data['cnpj']);
+        $filial->setCnpj(preg_replace('/[^\d]/', '', $data['cnpj']));
         $filial->setUf($data['uf']);
 
         $em->flush();
@@ -115,9 +115,9 @@ class FilialAdminService
           )
         ORDER BY u.nome
     ";
-
+        //echo trim($_SESSION['auth']['tenant_id']).' [] ',$filialId;
         return $conn->fetchAllAssociative($sql, [
-            'tenant' => $_SESSION['auth']['tenant_id'],
+            'tenant' => trim($_SESSION['auth']['tenant_id']),
             'filial' => $filialId,
         ]);
     }
@@ -156,5 +156,27 @@ class FilialAdminService
             'DELETE FROM sis_users_filiais WHERE user_id = ? AND filial_id = ?',
             [$userId, $filialId]
         );
+    }
+
+    public function filiaisDisponiveisParaUsuario(string $userId): array
+    {
+        $conn = EntityManagerFactory::create()->getConnection();
+
+        $sql = "
+        SELECT f.id, f.razao_social
+        FROM sis_filiais f
+        WHERE f.tenant_id = :tenant
+          AND f.id NOT IN (
+              SELECT filial_id
+              FROM sis_users_filiais
+              WHERE user_id = :user
+          )
+        ORDER BY f.razao_social
+    ";
+
+        return $conn->fetchAllAssociative($sql, [
+            'tenant' => $_SESSION['auth']['tenant_id'],
+            'user'   => $userId,
+        ]);
     }
 }

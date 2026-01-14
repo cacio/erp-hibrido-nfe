@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Core\Authorize;
+use App\Services\FilialAdminService;
 use App\Services\UserFilialAccessService;
 use App\Services\UserAdminService;
 use App\Services\RoleAdminService;
@@ -28,11 +29,14 @@ class AdminUserAccessController extends Controller
         Authorize::authorize('admin.users');
 
         $user = $this->users->find($id);
-
+        $accessService = new UserFilialAccessService();
         $this->render('admin/usuarios/acesso', [
             'user'    => $user,
             'filiais' => $user->getFiliais(),
             'roles'   => $this->roles->all(),
+            'acessos' => $accessService->acessosDoUsuario($id),
+            'filiaisDisponiveis' => (new FilialAdminService())
+                ->filiaisDisponiveisParaUsuario($id),
         ]);
     }
 

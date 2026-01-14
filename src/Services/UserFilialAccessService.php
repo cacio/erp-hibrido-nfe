@@ -65,4 +65,29 @@ class UserFilialAccessService
             ]);
         }
     }
+
+    public function acessosDoUsuario(string $userId): array
+    {
+        $conn = EntityManagerFactory::create()->getConnection();
+
+        $sql = "
+        SELECT
+            f.id AS filial_id,
+            f.razao_social,
+            GROUP_CONCAT(r.nome ORDER BY r.nome SEPARATOR ', ') AS roles
+        FROM sis_users_filiais uf
+        INNER JOIN sis_filiais f ON f.id = uf.filial_id
+        LEFT JOIN sis_user_filial_roles ufr
+            ON ufr.user_id = uf.user_id
+           AND ufr.filial_id = uf.filial_id
+        LEFT JOIN sis_roles r ON r.id = ufr.role_id
+        WHERE uf.user_id = :user
+        GROUP BY f.id, f.razao_social
+        ORDER BY f.razao_social
+    ";
+
+        return $conn->fetchAllAssociative($sql, [
+            'user' => $userId,
+        ]);
+    }
 }

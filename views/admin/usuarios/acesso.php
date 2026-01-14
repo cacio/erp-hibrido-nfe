@@ -17,52 +17,98 @@
     </div>
 <?php endif; ?>
 
-<h1>Acesso por Filial</h1>
 
-<p>
-    Usuário: <strong><?= htmlspecialchars($user->getNome()) ?></strong>
-</p>
+<div class="top-bar-header " style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div>
+        <h2 style="margin-bottom: 5px;">Acessos do Usuário</h2>
+        <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+            <div class="avatar" style="width: 24px; height: 24px; font-size: 10px;"><?= strtoupper(substr($user->getNome(), 0, 2)); ?></div>
+            <span style="font-weight: 600; color: var(--primary-color);"><?= htmlspecialchars($user->getNome()) ?></span>
+        </div>
+    </div>
+    <a href="/admin/usuarios" class="btn btn-outline">← Voltar para Usuários</a>
+</div>
+<!-- Alertas de Feedback -->
+<div class="alert alert-info">
+    <span>ℹ️</span>
+    <div><strong>Informação:</strong> Este usuário pode alternar entre as filiais listadas abaixo após o login.</div>
+</div>
 
-<form method="post" action="/admin/usuarios/acesso/salvar">
-    <input type="hidden" name="user_id" value="<?= $user->getId() ?>">
+<div style="display: grid; grid-template-columns: 1fr 350px; gap: 30px; align-items: start;">
 
-    <label>Filial</label>
-    <select name="filial_id" required onchange="this.form.submit()">
-        <option value="">Selecione</option>
-        <?php foreach ($filiais as $f): ?>
-            <option value="<?= $f->getId() ?>"
-                <?= ($_POST['filial_id'] ?? '') === $f->getId() ? 'selected' : '' ?>>
-                <?= htmlspecialchars($f->getRazaoSocial()) ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
+    <!-- Listagem de Filiais com Acesso -->
+    <section class="data-table-container">
+        <div class="table-filters">
+            <h3 style="font-size: 16px; font-weight: 600;">Unidades com Acesso</h3>
+        </div>
 
-    <?php if (!empty($_POST['filial_id'])): ?>
-        <fieldset>
-            <legend>Roles</legend>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Filial / Unidade</th>
+                        <th>Perfis Atribuídos</th>
+                        <th style="text-align: right;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($acessos as $a): ?>
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span style="font-size: 18px;">🏢</span>
+                                    <strong><?= htmlspecialchars($a['razao_social']) ?></strong>
+                                </div>
+                            </td>
+                            <td>
+                                <?php
+                                $rolesArray = explode(',', $a['roles']);
+                                foreach ($rolesArray as $role):
+                                ?>
+                                    <span class="badge badge-info"><?= htmlspecialchars(trim($role)) ?></span>
+                                <?php
+                                endforeach;
+                                ?>
+                            </td>
+                            <td style="text-align: right;">
+                                <a href="/admin/filiais/<?= $a['filial_id'] ?>/usuarios/<?= $user->getId() ?>/roles" class="btn btn-ghost" style="padding: 5px 10px; color: var(--primary-color);">Gerenciar Roles</a>
+                                <a href="/admin/filiais/<?= $a['filial_id'] ?>/usuarios/<?= $user->getId() ?>/remover" class="btn btn-ghost" style="padding: 5px 10px; color: #ef4444;" onclick="return confirm('Remover acesso?')">Remover</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </section>
 
-            <?php
-                $userRoles = array_column(
-                    (new \App\Services\UserFilialAccessService())
-                        ->rolesDoUsuario($user->getId(), $_POST['filial_id']),
-                    'id'
-                );
-            ?>
+    <!-- Formulário de Adição de Filial -->
+    <section class="stat-card" style="padding: 25px;">
+        <h3 class="section-title" style="margin-bottom: 20px;">Vincular Nova Filial</h3>
+        <form method="post" action="/admin/usuarios/<?= $user->getId() ?>/acessos/adicionar">
+            <div class="form-group">
+                <label class="form-label">Selecionar Filial Disponível</label>
+                <select class="form-control" name="filial_id" required>
+                    <option value="">Selecione uma unidade...</option>
+                    <?php foreach ($filiaisDisponiveis as $f): ?>
+                        <option value="<?= $f->getId() ?>">
+                            <?= htmlspecialchars($f->getRazaoSocial()) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                Adicionar Acesso
+            </button>
+        </form>
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
+                💡 Após adicionar a filial, não esqueça de configurar as <strong>Roles</strong> específicas para que o usuário tenha as permissões corretas naquela unidade.
+            </p>
+        </div>
+    </section>
 
-            <?php foreach ($roles as $r): ?>
-                <label style="display:block">
-                    <input type="checkbox"
-                           name="roles[]"
-                           value="<?= $r->getId() ?>"
-                           <?= in_array($r->getId(), $userRoles, true) ? 'checked' : '' ?>>
-                    <?= htmlspecialchars($r->getNome()) ?>
-                </label>
-            <?php endforeach; ?>
-        </fieldset>
+</div>
 
-        <button type="submit">Salvar</button>
-    <?php endif; ?>
-</form>
 <?php
 $content = ob_get_clean();
 $title = 'Acesso por Filial';

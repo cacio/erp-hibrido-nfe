@@ -1,4 +1,24 @@
 <?php ob_start(); ?>
+
+
+<?php if ($info = $this->getFlash('info')): ?>
+    <div class="alert alert-info">
+        <?= htmlspecialchars($info) ?>
+    </div>
+<?php endif; ?>
+
+<?php if ($error = $this->getFlash('error')): ?>
+    <div class="alert alert-error">
+        <?= htmlspecialchars($error) ?>
+    </div>
+<?php endif; ?>
+
+<?php if ($success = $this->getFlash('success')): ?>
+    <div class="alert alert-success">
+        <?= htmlspecialchars($success) ?>
+    </div>
+<?php endif; ?>
+
 <?php $edit = $edit ?? null; ?>
 
 <!-- Card de Formulário (Criar/Editar) -->

@@ -35,6 +35,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('GET', '/login', 'AuthController@showLoginForm');
     $r->addRoute('POST', '/login', 'AuthController@login');
     $r->addRoute('GET', '/logout', 'AuthController@logout');
+    $r->addRoute('POST', '/trocar-filial', 'AuthController@trocarFilial');
 
     // Rotas do Dashboard
     $r->addRoute('GET', '/dashboard', 'DashboardController@index');
@@ -90,6 +91,14 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
 
     // Remover usuário da filial
     $r->addRoute('GET','/admin/filiais/{filialId}/usuarios/{userId}/remover','AdminFilialAccessController@removeUser');
+
+    $r->addRoute('GET',  '/participantes',             'ParticipanteController@index');
+    $r->addRoute('POST', '/participantes',             'ParticipanteController@store');
+    $r->addRoute('GET',  '/participantes/create',      'ParticipanteController@create');
+    $r->addRoute('GET',  '/participantes/{id}/edit',   'ParticipanteController@edit');
+    $r->addRoute('POST', '/participantes/{id}',        'ParticipanteController@update');
+    $r->addRoute('GET',  '/participantes/buscar-doc',  'ParticipanteController@buscarDocumento');
+
 
     $r->addRoute('POST', '/api/sync', 'SyncController@receive');
     // Exemplo de rota com parâmetro: buscar um usuário por ID

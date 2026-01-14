@@ -1,14 +1,27 @@
 // Theme Toggle Logic
-        // Modal Logic
+       // Modal Logic
         function openModal(id) {
             document.getElementById(id).classList.add('active');
             if(id === 'search-modal') setTimeout(() => document.getElementById('global-search-input').focus(), 100);
         }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-        // Theme Logic
-        const themeToggle = document.getElementById('theme-toggle');
         const htmlElement = document.documentElement;
+
+        // Profile Dropdown Toggle
+        const profileTrigger = document.getElementById('profile-trigger');
+        const profileMenu = document.getElementById('profile-menu');
+
+        const profileContainer = document.querySelector('.profile-dropdown-container');
+        if(profileTrigger) {
+            profileTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileMenu.classList.toggle('active');
+                profileContainer.classList.toggle('active');
+            });
+        }
+
+        const themeToggle = document.getElementById('theme-toggle');
         themeToggle.addEventListener('click', () => {
             const isDark = htmlElement.getAttribute('data-theme') === 'dark';
             htmlElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
@@ -17,6 +30,25 @@
             updateChartsTheme();
         });
 
+        document.addEventListener('click', (e) => {
+            if (profileMenu && !profileMenu.contains(e.target) && !profileTrigger.contains(e.target)) {
+                profileMenu.classList.remove('active');
+                profileContainer.classList.remove('active');
+            }
+        });
+
+        // Theme Toggle (Updated for Dropdown Switch)
+        const themeCheckbox = document.getElementById('theme-toggle-checkbox');
+        if(themeCheckbox) {
+            themeCheckbox.checked = (htmlElement.getAttribute('data-theme') === 'dark');
+            themeCheckbox.addEventListener('change', () => {
+                const next = themeCheckbox.checked ? 'dark' : 'light';
+                htmlElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+                updateChartsTheme();
+            });
+        }
+
         // Sidebar Logic
         const miniLinks = document.querySelectorAll('.mini-link[data-target]');
         const detailPanels = document.querySelectorAll('.detail-panel');
@@ -24,21 +56,53 @@
         const dashboardContainer = document.getElementById('dashboard-container');
         const overlay = document.getElementById('sidebar-overlay');
 
+        function activatePanel(targetId) {
+            miniLinks.forEach(l => {
+                l.classList.remove('active');
+                if(l.getAttribute('data-target') === targetId) l.classList.add('active');
+            });
+            detailPanels.forEach(p => p.classList.remove('active'));
+            const targetPanel = document.getElementById(targetId);
+            if(targetPanel) targetPanel.classList.add('active');
+
+            detailSidebar.classList.add('open');
+            dashboardContainer.classList.remove('sidebar-collapsed');
+        }
+
         miniLinks.forEach(link => {
             link.addEventListener('click', () => {
                 const target = link.getAttribute('data-target');
-                miniLinks.forEach(l => l.classList.remove('active'));
-                link.classList.add('active');
-                detailPanels.forEach(p => p.classList.remove('active'));
-                document.getElementById(target).classList.add('active');
-                detailSidebar.classList.add('open');
-                dashboardContainer.classList.remove('sidebar-collapsed');
-
-                if (window.innerWidth < 1024) {
-                    overlay.classList.add('active');
-                }
+                activatePanel(target);
+                if (window.innerWidth < 1024) overlay.classList.add('active');
             });
         });
+
+        // Auto-activate menu based on URL (Supports Friendly Routes)
+        function autoActivateMenu() {
+            const currentPath = window.location.pathname;
+            const allLinks = document.querySelectorAll('.detail-link');
+            let found = false;
+
+            allLinks.forEach(link => {
+                const linkPath = link.getAttribute('href');
+
+                if (linkPath && linkPath !== '#' && (currentPath.includes(linkPath) || linkPath.includes(currentPath))) {
+                    link.classList.add('active');
+                    const parentPanel = link.closest('.detail-panel');
+                    if (parentPanel) {
+                        activatePanel(parentPanel.id);
+                        found = true;
+                    }
+                }
+            });
+
+            // Se não encontrar uma rota específica, ativa o Home por padrão
+            if (!found) {
+                activatePanel('home-panel');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', autoActivateMenu);
 
         document.getElementById('close-sidebar').addEventListener('click', () => {
             detailSidebar.classList.remove('open');

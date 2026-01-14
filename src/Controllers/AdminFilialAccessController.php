@@ -30,7 +30,7 @@ class AdminFilialAccessController extends Controller
     public function index(string $filialId)
     {
         Authorize::authorize('admin.filial.access');
-
+           // print_r($this->filialService->usuariosDisponiveis($filialId));
         $this->render('admin/filiais/acessos', [
             'filial'             => $this->filialService->find($filialId),
             'usuarios'           => $this->filialService->usuariosDaFilial($filialId),

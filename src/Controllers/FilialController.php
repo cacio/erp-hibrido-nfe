@@ -18,7 +18,18 @@ class FilialController extends Controller
     public function selecionarFilial()
     {
         $em = EntityManagerFactory::create();
-        $user = $em->find(User::class, $_SESSION['user_id']);
+        $user = $em->find(User::class, $_SESSION['auth']['user_id']);
+
+        $filiaisSessao = [];
+
+        foreach ($user->getFiliais() as $filial) {
+            $filiaisSessao[] = [
+                'id' => $filial->getId(),
+                'razao_social' => $filial->getRazaoSocial(),
+            ];
+        }
+
+        $_SESSION['auth']['filiais'] = $filiaisSessao;
 
         $this->render('auth/select-filial', [
             'filiais' => $user->getFiliais()
@@ -36,7 +47,8 @@ class FilialController extends Controller
             throw new \Exception('Filial inválida');
         }
 
-        $_SESSION['filial_id'] = $filial->getId();
+        $_SESSION['auth']['filial_id'] = $filial->getId();
+        $_SESSION['auth']['filial_nome'] = $filial->getRazaoSocial();
 
         $this->redirect('/dashboard');
     }

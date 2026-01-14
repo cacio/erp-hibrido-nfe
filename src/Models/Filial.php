@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use App\Models\Permission;
 
 #[ORM\Entity]
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: 'sis_filiais')]
 class Filial
 {
@@ -58,6 +59,21 @@ class Filial
     #[ORM\ManyToMany(targetEntity: Role::class)]
     #[ORM\JoinTable(name: 'sis_user_filial_roles')]
     private Collection $roles;
+
+    #[ORM\PrePersist]
+    public function onCreate(): void
+    {
+        $now = new \DateTime();
+
+        $this->created_at = $now;
+        $this->updated_at = $now;
+    }
+
+    #[ORM\PreUpdate]
+    public function onUpdate(): void
+    {
+        $this->updated_at = new \DateTime();
+    }
 
     public function __construct()
     {

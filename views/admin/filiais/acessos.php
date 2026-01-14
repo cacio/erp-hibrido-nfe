@@ -7,7 +7,7 @@
             🏢 <?= htmlspecialchars($filial->getRazaoSocial()) ?>
         </p>
     </div>
-    <a href="filiais.html" class="btn btn-outline">← Voltar para Filiais</a>
+    <a href="/admin/filiais" class="btn btn-outline">← Voltar para Filiais</a>
 </div>
 <hr style="margin-top: 5px; margin-bottom: 5px;">
 <div style="display: grid; grid-template-columns: 1fr 350px; gap: 30px; align-items: start;">
@@ -33,7 +33,7 @@
                         <tr>
                             <td>
                                 <div style="display: flex; align-items: center; gap: 10px;">
-                                    <div class="avatar" style="width: 28px; height: 28px; font-size: 10px;">JS</div>
+                                    <div class="avatar" style="width: 28px; height: 28px; font-size: 10px;"><?= strtoupper(substr($u['nome'], 0, 2)); ?></div>
                                     <strong><?= htmlspecialchars($u['nome']) ?></strong>
                                 </div>
                             </td>
@@ -65,13 +65,13 @@
     <!-- Formulário de Adição Rápida -->
     <section class="stat-card" style="padding: 25px;">
         <h3 class="section-title" style="margin-bottom: 20px;">Adicionar Usuário</h3>
-        <form method="post" action="/admin/filiais/acessos/adicionar">
+        <form method="post" action="/admin/filiais/<?= $filial->getId() ?>/usuarios/adicionar">
             <input type="hidden" name="filial_id" value="<?= $filial->getId() ?>">
             <div class="form-group">
                 <label class="form-label">Selecionar Usuário Disponível</label>
                 <select class="form-control" name="user_id" required>
                     <option value="">Selecione um usuário...</option>
-                    <?php foreach ($disponiveis as $u): ?>
+                    <?php foreach ($usuariosDisponiveis as $u): ?>
                         <option value="<?= $u['id'] ?>">
                             <?= htmlspecialchars($u['nome']) ?>
                         </option>
