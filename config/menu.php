@@ -55,6 +55,12 @@ return [
                         'label' => 'Participantes',
                         'route' => '/participantes',
                         'permission' => 'cadastro.participantes.view',
+                    ],
+                    [
+                        'icon' => '📦',
+                        'label' => 'Produtos',
+                        'route' => '/produtos',
+                        'permission' => 'cadastro.produto.view',
                     ]
                 ],
             ],

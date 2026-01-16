@@ -220,4 +220,32 @@ class Participante
     {
         return $this->updatedAt;
     }
+
+    public function getDadosFiscais(): array
+    {
+        $endereco = $this->getEndereco('principal');
+
+        if (!$endereco) {
+            throw new \DomainException('Participante sem endereço fiscal.');
+        }
+
+        return [
+            'cpf_cnpj'     => $this->getCpfCnpj(),
+            'nome'         => $this->getNomeRazao(),
+            'fantasia'     => $this->getNomeFantasia(),
+            'ind_iedest'   => $this->getIndIeDest(),
+            'ie'           => $this->getIe(),
+            'endereco'     => [
+                'logradouro'    => $endereco['logradouro'] ?? '',
+                'numero'        => $endereco['numero'] ?? '',
+                'complemento'   => $endereco['complemento'] ?? '',
+                'bairro'        => $endereco['bairro'] ?? '',
+                'cep'           => $endereco['cep'] ?? '',
+                'municipio'     => $endereco['municipio'] ?? '',
+                'cod_municipio' => $endereco['cod_municipio'] ?? '',
+                'uf'            => $endereco['uf'] ?? '',
+                'pais'          => $endereco['pais'] ?? '1058',
+            ]
+        ];
+    }
 }

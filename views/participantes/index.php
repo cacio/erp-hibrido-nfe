@@ -1,7 +1,7 @@
 <?php ob_start(); ?>
 
 
-<div class="top-bar-header">
+<div class="top-bar-header" style="margin-bottom: 20px;">
     <h1>Participantes</h1>
     <div class="top-bar-actions">
         <a href="/participantes/create" class="btn btn-primary">+ Novo Participante</a>
@@ -26,8 +26,9 @@
                     <option value="0" <?= $filtros['ativo'] == 0 ? 'selected' : '' ?>>Inativos</option>
                 </select>
             </div>
-            <button type="submit" class="btn btn-ghost">Filtrar</button>
+            <button type="submit" class="btn btn-secondary">Filtrar</button>
         </div>
+    </section>
 </form>
 
 <!-- ================= TABELA ================= -->
@@ -73,9 +74,10 @@
                                 ? '<span class="badge badge-success">Ativo</span>'
                                 : '<span class="badge badge-red">Inativo</span>' ?>
                         </td>
-                        <td style="text-align: right;">
+                        <td>
                             <a href="/participantes/<?= $p->getId() ?>/edit" class="btn btn-ghost" style="padding: 5px 10px;">Editar</a>
-                            <button class="btn btn-ghost" style="padding: 5px 10px; color: var(--danger-color);">Excluir</button>
+                            |
+                            <a href="#" class="btn btn-ghost" style="padding: 5px 10px; color: #ef4444;">Excluir</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -94,7 +96,8 @@ $fim = min(
 );
 ?>
 
-<?php if ($totalPaginas > 1): ?>
+<?php if ($totalPaginas > 0): ?>
+
     <div class="pagination">
         <div class="pagination-info">
             Mostrando <?= $inicio ?>-<?= $fim ?>
@@ -105,22 +108,22 @@ $fim = min(
 
             <!-- ANTERIOR -->
             <?php if ($paginaAtual > 1): ?>
-                <a class="page-btn"
+                <a class="page-btn page-link"
                     href="?page=<?= $paginaAtual - 1 ?>
                &q=<?= urlencode($filtros['q']) ?>
                &tipo=<?= urlencode($filtros['tipo']) ?>">
                     Anterior
                 </a>
             <?php else: ?>
-                <button class="page-btn" disabled>Anterior</button>
+                <button class="page-btn page-link" disabled>Anterior</button>
             <?php endif; ?>
 
             <!-- NÚMEROS -->
             <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
                 <?php if ($i == $paginaAtual): ?>
-                    <button class="page-btn active"><?= $i ?></button>
+                    <button class="page-btn page-link active"><?= $i ?></button>
                 <?php else: ?>
-                    <a class="page-btn"
+                    <a class="page-btn page-link"
                         href="?page=<?= $i ?>
                    &q=<?= urlencode($filtros['q']) ?>
                    &tipo=<?= urlencode($filtros['tipo']) ?>">
@@ -131,14 +134,14 @@ $fim = min(
 
             <!-- PRÓXIMO -->
             <?php if ($paginaAtual < $totalPaginas): ?>
-                <a class="page-btn"
+                <a class="page-btn page-link"
                     href="?page=<?= $paginaAtual + 1 ?>
                &q=<?= urlencode($filtros['q']) ?>
                &tipo=<?= urlencode($filtros['tipo']) ?>">
                     Próximo
                 </a>
             <?php else: ?>
-                <button class="page-btn" disabled>Próximo</button>
+                <button class="page-btn page-link" disabled>Próximo</button>
             <?php endif; ?>
 
         </div>

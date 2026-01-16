@@ -9,7 +9,7 @@ use App\Services\MenuService; ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Dashboard' ?> - ERP Híbrido</title>
-    <link rel="stylesheet" href="/css/style.css?v=1.0.0.6">
+    <link rel="stylesheet" href="/css/style.css?v=1.0.0.7">
 </head>
 
 <body>

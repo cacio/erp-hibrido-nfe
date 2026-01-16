@@ -98,7 +98,15 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('GET',  '/participantes/{id}/edit',   'ParticipanteController@edit');
     $r->addRoute('POST', '/participantes/{id}',        'ParticipanteController@update');
     $r->addRoute('GET',  '/participantes/buscar-doc',  'ParticipanteController@buscarDocumento');
+    $r->addRoute('GET','/participantes/buscar-cnpj-externo', 'ParticipanteController@buscarCnpjExterno');
+    $r->addRoute('GET','/enderecos/buscar-cep','ParticipanteController@buscarCep');
 
+
+    $r->addRoute('GET',  '/produtos',                'ProdutoController@index');
+    $r->addRoute('GET',  '/produtos/create',         'ProdutoController@create');
+    $r->addRoute('POST', '/produtos',                'ProdutoController@store');
+    $r->addRoute('GET',  '/produtos/{id}/edit',      'ProdutoController@edit');
+    $r->addRoute('POST', '/produtos/{id}',           'ProdutoController@update');
 
     $r->addRoute('POST', '/api/sync', 'SyncController@receive');
     // Exemplo de rota com parâmetro: buscar um usuário por ID

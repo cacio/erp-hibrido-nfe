@@ -46,14 +46,13 @@
 </style>
 <div class="top-bar-header">
     <div style="display: flex; align-items: center; gap: 15px;">
-        <a href="/participantes" class="btn btn-ghost" style="padding: 8px;">←</a>
-        <h1>Novo Participante</h1>
+        <a href="/participantes" class="btn btn-ghost" style="padding: 8px;">← Voltar</a>
+        <h1>Editar Participante</h1>
     </div>
     <div class="top-bar-actions">
-        <button type="button" onclick="document.getElementById('main-form').submit()" class="btn btn-primary">Salvar Cadastro</button>
+        <button type="button" onclick="document.getElementById('main-form').submit()" class="btn btn-primary">Salvar Alterações</button>
     </div>
 </div>
-
 <?php if ($info = $this->getFlash('info')): ?>
     <div class="alert alert-info">
         <?= htmlspecialchars($info) ?>
@@ -71,7 +70,7 @@
         <?= htmlspecialchars($success) ?>
     </div>
 <?php endif; ?>
-<form id="main-form" method="post" action="/participantes">
+<form id="main-form" method="post" action="/participantes/<?= $participante->getId() ?>">
     <div style="display: grid; grid-template-columns: 1fr 350px; gap: 25px; align-items: start;">
 
         <!-- Coluna Principal: Dados e Endereços -->
@@ -83,15 +82,15 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div class="form-group" style="grid-column: span 2;">
                         <label class="group-label">Nome ou Razão Social *</label>
-                        <input type="text" class="form-control" name="nome_razao" required placeholder="Ex: João Silva ou Empresa LTDA">
+                        <input type="text" class="form-control" name="nome_razao" value="<?= htmlspecialchars($participante->getNomeRazao()) ?>" required placeholder="Ex: João Silva ou Empresa LTDA">
                     </div>
                     <div class="form-group">
                         <label class="group-label">Nome Fantasia</label>
-                        <input type="text" class="form-control" name="nome_fantasia" placeholder="Nome comercial">
+                        <input type="text" class="form-control" value="<?= htmlspecialchars($participante->getNomeFantasia() ?? '') ?>" name="nome_fantasia" placeholder="Nome comercial">
                     </div>
                     <div class="form-group">
                         <label class="group-label">CPF / CNPJ</label>
-                        <input type="text" class="form-control" name="cpf_cnpj" id="cpf_cnpj" placeholder="Somente números" maxlength="14">
+                        <input type="text" class="form-control" name="cpf_cnpj" id="cpf_cnpj" value="<?= htmlspecialchars($participante->getCpfCnpj()) ?>" placeholder="Somente números" maxlength="14">
                     </div>
                 </div>
             </section>
@@ -103,92 +102,190 @@
                     <div class="form-group">
                         <label class="group-label">Indicador IE Destinatário</label>
                         <select class="form-control" name="ind_iedest">
-                            <option value="1">Contribuinte ICMS</option>
-                            <option value="2">Isento</option>
-                            <option value="9" selected>Não Contribuinte</option>
+                            <option value="1" <?= $participante->getIndIeDest() == 1 ? 'selected' : '' ?>>Contribuinte ICMS</option>
+                            <option value="2" <?= $participante->getIndIeDest() == 2 ? 'selected' : '' ?>>Isento</option>
+                            <option value="9" <?= $participante->getIndIeDest() == 9 ? 'selected' : '' ?>>Não Contribuinte</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label class="group-label">Inscrição Estadual</label>
-                        <input type="text" class="form-control" name="ie" placeholder="IE">
+                        <input type="text" class="form-control" value="<?= htmlspecialchars($participante->getIe() ?? '') ?>" name="ie" placeholder="IE">
                     </div>
                 </div>
             </section>
-
+            <?php
+            $enderecos = $participante->getEnderecoJson() ?? [];
+            $principal = $enderecos['principal'] ?? [];
+            ?>
             <!-- Card: Endereços -->
             <section class="stat-card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h2 class="panel-title" style="margin-bottom: 0;">Endereços</h2>
-                    <button type="button" class="btn btn-ghost" onclick="addAddress()" style="font-size: 12px;">+ Adicionar Outro Endereço</button>
+                    <button type="button" class="btn btn-ghost" onclick="addAddress()" style="font-size: 12px;">
+                        + Adicionar Outro Endereço
+                    </button>
                 </div>
 
                 <div id="address-container">
-                    <!-- Endereço Principal Fixo -->
+
+                    <!-- ================= ENDEREÇO PRINCIPAL ================= -->
                     <div class="address-card main-address" id="main-address-card">
                         <span class="address-badge">Endereço Principal</span>
+
                         <input type="hidden" name="enderecos[principal][pais]" value="1058">
 
                         <div style="display: grid; grid-template-columns: 150px 1fr; gap: 15px; margin-top: 10px;">
                             <div class="form-group">
                                 <label class="group-label" style="font-size: 10px;">CEP</label>
-                                <input type="text" class="form-control" name="enderecos[principal][cep]" placeholder="00000-000" style="height: 35px; font-size: 13px;">
+                                <input type="text" class="form-control"
+                                    name="enderecos[principal][cep]"
+                                    value="<?= htmlspecialchars($principal['cep'] ?? '') ?>">
                             </div>
                             <div class="form-group">
                                 <label class="group-label" style="font-size: 10px;">Logradouro</label>
-                                <input type="text" class="form-control" name="enderecos[principal][logradouro]" placeholder="Rua, Av..." style="height: 35px; font-size: 13px;">
+                                <input type="text" class="form-control"
+                                    name="enderecos[principal][logradouro]"
+                                    value="<?= htmlspecialchars($principal['logradouro'] ?? '') ?>">
                             </div>
                         </div>
 
                         <div style="display: grid; grid-template-columns: 100px 1fr; gap: 15px; margin-top: 10px;">
                             <div class="form-group">
                                 <label class="group-label" style="font-size: 10px;">Número</label>
-                                <input type="text" class="form-control" name="enderecos[principal][numero]" placeholder="Nº" style="height: 35px; font-size: 13px;">
+                                <input type="text" class="form-control"
+                                    name="enderecos[principal][numero]"
+                                    value="<?= htmlspecialchars($principal['numero'] ?? '') ?>">
                             </div>
                             <div class="form-group">
                                 <label class="group-label" style="font-size: 10px;">Complemento</label>
-                                <input type="text" class="form-control" name="enderecos[principal][complemento]" placeholder="Apto, Bloco..." style="height: 35px; font-size: 13px;">
+                                <input type="text" class="form-control"
+                                    name="enderecos[principal][complemento]"
+                                    value="<?= htmlspecialchars($principal['complemento'] ?? '') ?>">
                             </div>
                         </div>
 
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 80px; gap: 15px; margin-top: 10px;">
                             <div class="form-group">
                                 <label class="group-label" style="font-size: 10px;">Bairro</label>
-                                <input type="text" class="form-control" name="enderecos[principal][bairro]" placeholder="Bairro" style="height: 35px; font-size: 13px;">
+                                <input type="text" class="form-control"
+                                    name="enderecos[principal][bairro]"
+                                    value="<?= htmlspecialchars($principal['bairro'] ?? '') ?>">
                             </div>
                             <div class="form-group">
                                 <label class="group-label" style="font-size: 10px;">Município</label>
-                                <input type="text" class="form-control" name="enderecos[principal][municipio]" placeholder="Nome da Cidade" style="height: 35px; font-size: 13px;">
+                                <input type="text" class="form-control"
+                                    name="enderecos[principal][municipio]"
+                                    value="<?= htmlspecialchars($principal['municipio'] ?? '') ?>">
                             </div>
                             <div class="form-group">
                                 <label class="group-label" style="font-size: 10px;">Cód. IBGE</label>
-                                <input type="text" class="form-control" name="enderecos[principal][cod_municipio]" placeholder="Código" style="height: 35px; font-size: 13px;">
+                                <input type="text" class="form-control"
+                                    name="enderecos[principal][cod_municipio]"
+                                    value="<?= htmlspecialchars($principal['cod_municipio'] ?? '') ?>">
                             </div>
                             <div class="form-group">
                                 <label class="group-label" style="font-size: 10px;">UF</label>
-                                <input type="text" class="form-control" name="enderecos[principal][uf]" maxlength="2" placeholder="UF" style="height: 35px; font-size: 13px;">
+                                <input type="text" class="form-control"
+                                    name="enderecos[principal][uf]"
+                                    maxlength="2"
+                                    value="<?= htmlspecialchars($principal['uf'] ?? '') ?>">
                             </div>
                         </div>
                     </div>
-                    <!-- Outros endereços serão inseridos aqui -->
+
+                    <!-- ================= ENDEREÇOS ADICIONAIS ================= -->
+                    <?php foreach ($enderecos as $tipo => $endereco): ?>
+                        <?php if ($tipo === 'principal') continue; ?>
+
+                        <div class="address-card additional-address">
+                            <span class="address-badge"><?= ucfirst(str_replace('_', ' ', $tipo)) ?></span>
+                            <span class="remove-address" onclick="removeAddress(this)">Remover</span>
+
+                            <input type="hidden"
+                                class="addr-pais"
+                                name="enderecos[<?= $tipo ?>][pais]"
+                                value="<?= htmlspecialchars($endereco['pais'] ?? '1058') ?>">
+
+                            <div style="display: grid; grid-template-columns: 150px 1fr; gap: 15px; margin-top: 10px;">
+                                <div class="form-group">
+                                    <label class="group-label" style="font-size: 10px;">CEP</label>
+                                    <input type="text" class="form-control addr-cep"
+                                        name="enderecos[<?= $tipo ?>][cep]"
+                                        value="<?= htmlspecialchars($endereco['cep'] ?? '') ?>">
+                                </div>
+                                <div class="form-group">
+                                    <label class="group-label" style="font-size: 10px;">Logradouro</label>
+                                    <input type="text" class="form-control addr-logradouro"
+                                        name="enderecos[<?= $tipo ?>][logradouro]"
+                                        value="<?= htmlspecialchars($endereco['logradouro'] ?? '') ?>">
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 100px 1fr; gap: 15px; margin-top: 10px;">
+                                <div class="form-group">
+                                    <label class="group-label" style="font-size: 10px;">Número</label>
+                                    <input type="text" class="form-control addr-numero"
+                                        name="enderecos[<?= $tipo ?>][numero]"
+                                        value="<?= htmlspecialchars($endereco['numero'] ?? '') ?>">
+                                </div>
+                                <div class="form-group">
+                                    <label class="group-label" style="font-size: 10px;">Complemento</label>
+                                    <input type="text" class="form-control addr-complemento"
+                                        name="enderecos[<?= $tipo ?>][complemento]"
+                                        value="<?= htmlspecialchars($endereco['complemento'] ?? '') ?>">
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 80px; gap: 15px; margin-top: 10px;">
+                                <div class="form-group">
+                                    <label class="group-label" style="font-size: 10px;">Bairro</label>
+                                    <input type="text" class="form-control addr-bairro"
+                                        name="enderecos[<?= $tipo ?>][bairro]"
+                                        value="<?= htmlspecialchars($endereco['bairro'] ?? '') ?>">
+                                </div>
+                                <div class="form-group">
+                                    <label class="group-label" style="font-size: 10px;">Município</label>
+                                    <input type="text" class="form-control addr-municipio"
+                                        name="enderecos[<?= $tipo ?>][municipio]"
+                                        value="<?= htmlspecialchars($endereco['municipio'] ?? '') ?>">
+                                </div>
+                                <div class="form-group">
+                                    <label class="group-label" style="font-size: 10px;">Cód. IBGE</label>
+                                    <input type="text" class="form-control addr-cod-municipio"
+                                        name="enderecos[<?= $tipo ?>][cod_municipio]"
+                                        value="<?= htmlspecialchars($endereco['cod_municipio'] ?? '') ?>">
+                                </div>
+                                <div class="form-group">
+                                    <label class="group-label" style="font-size: 10px;">UF</label>
+                                    <input type="text" class="form-control addr-uf"
+                                        maxlength="2"
+                                        name="enderecos[<?= $tipo ?>][uf]"
+                                        value="<?= htmlspecialchars($endereco['uf'] ?? '') ?>">
+                                </div>
+                            </div>
+                        </div>
+
+                    <?php endforeach; ?>
+
                 </div>
             </section>
         </div>
 
         <!-- Coluna Lateral: Configurações e Contato -->
         <div style="display: flex; flex-direction: column; gap: 25px;">
-
+            <?php $tipos = $participante->getTipoCadastro(); ?>
             <!-- Card: Tipo de Cadastro -->
             <section class="stat-card">
                 <h2 class="panel-title">Tipo de Cadastro</h2>
                 <div style="display: flex; flex-direction: column; gap: 10px; background: var(--bg-main); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
                     <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                        <input type="checkbox" name="tipo_cadastro[]" value="CLIENTE"> <span>Cliente</span>
+                        <input type="checkbox" name="tipo_cadastro[]" value="CLIENTE" <?= in_array('CLIENTE', $tipos) ? 'checked' : '' ?>> <span>Cliente</span>
                     </label>
                     <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                        <input type="checkbox" name="tipo_cadastro[]" value="FORNECEDOR"> <span>Fornecedor</span>
+                        <input type="checkbox" name="tipo_cadastro[]" value="FORNECEDOR" <?= in_array('FORNECEDOR', $tipos) ? 'checked' : '' ?>> <span>Fornecedor</span>
                     </label>
                     <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                        <input type="checkbox" name="tipo_cadastro[]" value="TRANSPORTADORA"> <span>Transportadora</span>
+                        <input type="checkbox" name="tipo_cadastro[]" value="TRANSPORTADORA" <?= in_array('TRANSPORTADORA', $tipos) ? 'checked' : '' ?>> <span>Transportadora</span>
                     </label>
                 </div>
             </section>
@@ -198,11 +295,11 @@
                 <h2 class="panel-title">Contato</h2>
                 <div class="form-group">
                     <label class="group-label">Telefone</label>
-                    <input type="text" class="form-control" name="telefone" placeholder="(00) 00000-0000">
+                    <input type="text" class="form-control" name="telefone" value="<?= $participante->getTelefone()  ?>" placeholder="(00) 00000-0000">
                 </div>
                 <div class="form-group" style="margin-top: 15px;">
                     <label class="group-label">E-mail</label>
-                    <input type="email" class="form-control" name="email" placeholder="email@exemplo.com">
+                    <input type="email" class="form-control" name="email" value="<?= $participante->getEmail();  ?>" placeholder="email@exemplo.com">
                 </div>
             </section>
 
@@ -212,7 +309,7 @@
                 <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background: var(--bg-main); border-radius: 8px;">
                     <span style="font-size: 14px; font-weight: 500;">Cadastro Ativo</span>
                     <label class="switch">
-                        <input type="checkbox" name="ativo" value="1" checked>
+                        <input type="checkbox" name="ativo" value="1" <?php if ($participante->isAtivo()) echo 'checked'; ?>>
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -289,6 +386,7 @@
     </div>
 </template>
 
+
 <script>
     function addAddress() {
         const container = document.getElementById('address-container');
@@ -342,6 +440,7 @@
         }
     });
 
+
     document.getElementById('cpf_cnpj').addEventListener('blur', function() {
         const doc = this.value.replace(/\D/g, '');
 
@@ -394,17 +493,11 @@
         document.querySelector('[name="email"]').value = data.email ?? '';
     }
 
-    document.addEventListener('focusout', function(e) {
-
-        // CEP do endereço principal
-        const isPrincipal =
-            e.target.name === 'enderecos[principal][cep]';
-
-        // CEP dos endereços adicionais
-        const isAdicional =
-            e.target.classList.contains('addr-cep');
-
-        if (!isPrincipal && !isAdicional) return;
+    document.addEventListener('blur', function(e) {
+        if (!e.target.classList.contains('addr-cep') &&
+            e.target.name !== 'enderecos[principal][cep]') {
+            return;
+        }
 
         const cep = e.target.value.replace(/\D/g, '');
         if (cep.length !== 8) return;
@@ -416,27 +509,22 @@
 
                 const card = e.target.closest('.address-card');
 
-                const setValue = (selector, value) => {
+                const set = (selector, value) => {
                     const el = card.querySelector(selector);
-                    if (el && !el.value) {
-                        el.value = value ?? '';
-                    }
+                    if (el && !el.value) el.value = value ?? '';
                 };
 
-                setValue('[name$="[logradouro]"], .addr-logradouro', data.logradouro);
-                setValue('[name$="[bairro]"], .addr-bairro', data.bairro);
-                setValue('[name$="[municipio]"], .addr-municipio', data.municipio);
-                setValue('[name$="[uf]"], .addr-uf', data.uf);
-                setValue('[name$="[cod_municipio]"], .addr-cod-municipio', data.cod_municipio);
-            })
-            .catch(() => {
-                console.warn('Erro ao buscar CEP');
+                set('[name$="[logradouro]"], .addr-logradouro', data.logradouro);
+                set('[name$="[bairro]"], .addr-bairro', data.bairro);
+                set('[name$="[municipio]"], .addr-municipio', data.municipio);
+                set('[name$="[uf]"], .addr-uf', data.uf);
+                set('[name$="[cod_municipio]"], .addr-cod-municipio', data.cod_municipio);
             });
     });
 </script>
 <?php
 $content = ob_get_clean();
-$title = 'Criar Participante';
-$titletopbar = "Criar Novo Participante";
+$title = 'Editar Participante';
+$titletopbar = "Editar Participante";
 include __DIR__ . '/../layouts/app.php';
 ?>

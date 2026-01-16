@@ -7,6 +7,9 @@ use App\Core\Controller;
 use App\Services\ParticipanteService;
 use App\Models\Participante;
 use App\Core\EntityManagerFactory;
+use App\Services\CepLookupService;
+use App\Services\CnpjLookupService;
+use App\Services\ParticipanteFiscalValidator;
 
 class ParticipanteController extends Controller
 {
@@ -40,7 +43,7 @@ class ParticipanteController extends Controller
             [
                 'q'    => $q,
                 'tipo' => $tipo,
-                'ativo'=> $ativo,
+                'ativo' => $ativo,
             ],
             $pagina,
             20
@@ -52,7 +55,7 @@ class ParticipanteController extends Controller
             'filtros'       => [
                 'q'    => $q,
                 'tipo' => $tipo,
-                'ativo'=> $ativo,
+                'ativo' => $ativo,
             ]
         ]);
     }
@@ -75,6 +78,9 @@ class ParticipanteController extends Controller
         $dados    = $_POST;
 
         try {
+            $validator = new ParticipanteFiscalValidator();
+            $validator->validar($dados);
+
             $this->service->criar($tenantId, $dados);
 
             $this->flash('success', 'Participante cadastrado com sucesso.');
@@ -124,6 +130,7 @@ class ParticipanteController extends Controller
         }
 
         try {
+
             $this->service->atualizar($participante, $dados);
 
             $this->flash('success', 'Participante atualizado com sucesso.');
@@ -140,19 +147,71 @@ class ParticipanteController extends Controller
     public function buscarDocumento(): void
     {
         $tenantId = $_SESSION['auth']['tenant_id'];
-        $doc      = $_GET['cpf_cnpj'] ?? '';
+        $doc = $_GET['cpf_cnpj'] ?? '';
+
+        if (empty($doc)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Documento não informado']);
+            return;
+        }
 
         $participante = $this->service
             ->buscarPorDocumento($tenantId, $doc);
 
         header('Content-Type: application/json');
-        echo json_encode($participante ? [
-            'id'             => $participante->getId(),
-            'cpf_cnpj'       => $participante->getCpfCnpj(),
-            'nome_razao'     => $participante->getNomeRazao(),
-            'nome_fantasia'  => $participante->getNomeFantasia(),
-            'tipo_cadastro'  => $participante->getTipoCadastro(),
-            'enderecos'      => $participante->getEnderecoJson()
-        ] : null);
+
+        if (!$participante) {
+            echo json_encode(null);
+            return;
+        }
+
+        echo json_encode([
+            'id'            => $participante->getId(),
+            'cpf_cnpj'      => $participante->getCpfCnpj(),
+            'nome_razao'    => $participante->getNomeRazao(),
+            'nome_fantasia' => $participante->getNomeFantasia(),
+            'tipo_cadastro' => $participante->getTipoCadastro(),
+            'ind_iedest'    => $participante->getIndIeDest(),
+            'ie'            => $participante->getIe(),
+            'telefone'      => $participante->getTelefone(),
+            'email'         => $participante->getEmail(),
+            'enderecos'     => $participante->getEnderecoJson(),
+            'ativo'         => $participante->isAtivo()
+        ]);
+    }
+
+    public function buscarCnpjExterno(): void
+    {
+        $cnpj = $_GET['cnpj'] ?? '';
+
+        $service = new CnpjLookupService();
+        $dados = $service->buscar($cnpj);
+
+        header('Content-Type: application/json');
+
+        if (!$dados) {
+            echo json_encode(null);
+            return;
+        }
+
+        echo json_encode($dados);
+    }
+
+
+    public function buscarCep(): void
+    {
+        $cep = $_GET['cep'] ?? '';
+
+        $service = new CepLookupService();
+        $dados = $service->buscar($cep);
+
+        header('Content-Type: application/json');
+
+        if (!$dados) {
+            echo json_encode(null);
+            return;
+        }
+
+        echo json_encode($dados);
     }
 }

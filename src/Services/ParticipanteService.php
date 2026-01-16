@@ -135,6 +135,9 @@ class ParticipanteService
             }
         }
 
+        $validator = new ParticipanteFiscalValidator();
+        $validator->validar($dados);
+
         $this->mapearDados($participante, $dados);
 
         $this->em->flush();
