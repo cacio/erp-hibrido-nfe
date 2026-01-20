@@ -8,9 +8,16 @@ use Ramsey\Uuid\Uuid;
 
 class ProdutoService
 {
+
+     private readonly SyncFilaService $syncFilaService;
+     private readonly SyncMapService $syncMapService;
+
     public function __construct(
         private EntityManagerInterface $em
-    ) {}
+    ) {
+        $this->syncFilaService = new SyncFilaService($em);
+        $this->syncMapService = new SyncMapService($em);
+    }
 
     // =========================
     // LISTAGEM SIMPLES (usada pelo paginado)
@@ -121,10 +128,36 @@ class ProdutoService
         $this->mapearDados($produto, $dados);
 
         $this->em->persist($produto);
-        $this->em->flush();
+        $this->em->flush(); // 🔥 aqui o produto já existe no banco
+
+        // ==================================================
+        // 🔁 SYNC WEB → DESK (APÓS FLUSH)
+        // ==================================================
+        $filialId = $_SESSION['auth']['filial_id'];
+
+        $payload = [
+            'id'          => $produto->getId(),
+            'descricao'   => $produto->getDescricao(),
+            'codigo_sku'  => $produto->getCodigoSku(),
+            'ncm'         => $produto->getNcm(),
+            'unidade'     => $produto->getUnidade(),
+            'ativo'       => $produto->isAtivo(),
+            'updated_at'  => date('Y-m-d H:i:s'),
+        ];
+
+        $this->syncFilaService->criar(
+            $filialId,          // 🔑 FILIAL
+            'cad_produtos',     // tabela
+            $produto->getId(),  // id_web
+            '0',                // id_desk (0 = ainda não existe no desktop)
+            'UPSERT',
+            'WEB_TO_DESK',
+            $payload
+        );
 
         return $produto;
     }
+
 
     // =========================
     // ATUALIZAR
@@ -142,12 +175,47 @@ class ProdutoService
             }
         }
 
+        // 1️⃣ Atualiza entidade
         $this->mapearDados($produto, $dados);
 
+        // 2️⃣ Persiste
         $this->em->flush();
+
+        // ==================================================
+        // 🔁 SYNC WEB → DESK (APÓS FLUSH)
+        // ==================================================
+        $filialId = $_SESSION['auth']['filial_id'];
+
+        // tenta resolver ID Desk
+        $idDesk = $this->syncMapService->buscarPorWeb(
+            $filialId,
+            'cad_produtos',
+            $produto->getId()
+        ) ?? '0';
+
+        $payload = [
+            'id'          => $produto->getId(),
+            'descricao'   => $produto->getDescricao(),
+            'codigo_sku'  => $produto->getCodigoSku(),
+            'ncm'         => $produto->getNcm(),
+            'unidade'     => $produto->getUnidade(),
+            'ativo'       => $produto->isAtivo(),
+            'updated_at'  => date('Y-m-d H:i:s'),
+        ];
+
+        $this->syncFilaService->criar(
+            $filialId,          // 🔑 escopo da filial
+            'cad_produtos',
+            $produto->getId(),  // id_web
+            $idDesk,            // id_desk (ou 0)
+            'UPSERT',
+            'WEB_TO_DESK',
+            $payload
+        );
 
         return $produto;
     }
+
 
     // =========================
     // VALIDAÇÕES

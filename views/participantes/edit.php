@@ -116,6 +116,8 @@
             <?php
             $enderecos = $participante->getEnderecoJson() ?? [];
             $principal = $enderecos['principal'] ?? [];
+
+            //print_r($enderecos);
             ?>
             <!-- Card: Endereços -->
             <section class="stat-card">

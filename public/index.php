@@ -108,7 +108,25 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('GET',  '/produtos/{id}/edit',      'ProdutoController@edit');
     $r->addRoute('POST', '/produtos/{id}',           'ProdutoController@update');
 
+    $r->addRoute('GET',  '/estoque/ajuste', 'AjusteEstoqueController@create');
+    $r->addRoute('POST', '/estoque/ajuste', 'AjusteEstoqueController@store');
+
+    $r->addRoute('GET', '/estoque/saldos', 'ConsultaSaldoController@index');
+    $r->addRoute('GET', '/estoque/kardex', 'KardexController@index');
+
+    $r->addRoute('POST','/api/sync/desk','Api\\SyncDeskController@receive');
+    $r->addRoute('GET','/api/sync/ack','Api\\SyncAckController@status');
+
     $r->addRoute('POST', '/api/sync', 'SyncController@receive');
+
+    $r->get('/api/sync/pull', 'Api\\SyncPullController@pull');
+    $r->post('/api/sync/ack',   'Api\\SyncAckController@ack');
+
+    $r->get('/sync', 'SyncDashboardController@index');
+    $r->post('/sync/reprocessar', 'SyncDashboardController@reprocessar');
+    $r->get('/sync/payload', 'SyncDashboardController@payload');
+
+
     // Exemplo de rota com parâmetro: buscar um usuário por ID
     // O {id:\d+} garante que o ID seja um ou mais dígitos numéricos
     $r->addRoute('GET', '/users/{id:\d+}', 'UserController@show');

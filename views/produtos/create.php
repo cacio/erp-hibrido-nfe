@@ -14,7 +14,23 @@
         </button>
     </div>
 </div>
+<?php if ($info = $this->getFlash('info')): ?>
+    <div class="alert alert-info">
+        <?= htmlspecialchars($info) ?>
+    </div>
+<?php endif; ?>
 
+<?php if ($error = $this->getFlash('error')): ?>
+    <div class="alert alert-danger">
+        <?= htmlspecialchars($error) ?>
+    </div>
+<?php endif; ?>
+
+<?php if ($success = $this->getFlash('success')): ?>
+    <div class="alert alert-success">
+        <?= htmlspecialchars($success) ?>
+    </div>
+<?php endif; ?>
 <form id="form-produto" method="post" action="/produtos">
     <div style="display:grid; grid-template-columns:1fr 360px; gap:25px;">
 

@@ -9,7 +9,7 @@ use App\Services\MenuService; ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Dashboard' ?> - ERP Híbrido</title>
-    <link rel="stylesheet" href="/css/style.css?v=1.0.0.7">
+    <link rel="stylesheet" href="/css/style.css?v=1.0.0.8">
 </head>
 
 <body>
@@ -18,19 +18,46 @@ use App\Services\MenuService; ?>
     <div class="modal-overlay" id="search-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Busca Global</h3>
+                <h2>Busca Global</h2>
                 <button class="modal-close" onclick="closeModal('search-modal')">&times;</button>
             </div>
-            <div class="search-input-wrapper">
-                <span class="search-icon-inner">🔍</span>
-                <input type="text" placeholder="Buscar por projetos, clientes ou arquivos..." id="global-search-input">
+            <div class="modal-body">
+                <div class="search-input-wrapper">
+                    <span class="search-icon-inner">🔍</span>
+                    <input type="text" placeholder="Buscar por projetos, clientes ou arquivos..." id="global-search-input">
+                </div>
+                <div class="search-results">
+                    <p style="font-size: 13px; color: var(--text-muted);">Sugestões recentes:</p>
+                    <ul style="list-style: none; margin-top: 10px;">
+                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; background: var(--bg-color); margin-bottom: 8px; border: 1px solid var(--border-color);">📁 Projeto E-commerce</li>
+                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; background: var(--bg-color); margin-bottom: 8px; border: 1px solid var(--border-color);">👥 Maria Oliveira</li>
+                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; background: var(--bg-color); margin-bottom: 8px; border: 1px solid var(--border-color);">📦 Produto: Cerveja IPA</li>
+                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; background: var(--bg-color); margin-bottom: 8px; border: 1px solid var(--border-color);">🏢 Filial Norte</li>
+                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; background: var(--bg-color); margin-bottom: 8px; border: 1px solid var(--border-color);">📄 Relatório Mensal</li>
+                    </ul>
+                </div>
             </div>
-            <div class="search-results">
-                <p style="font-size: 13px; color: var(--text-muted);">Sugestões recentes:</p>
-                <ul style="list-style: none; margin-top: 10px;">
-                    <li style="padding: 10px; border-radius: 8px; cursor: pointer; background: var(--bg-color); margin-bottom: 5px;">📁 Projeto E-commerce</li>
-                    <li style="padding: 10px; border-radius: 8px; cursor: pointer; background: var(--bg-color); margin-bottom: 5px;">👥 Maria Oliveira</li>
-                </ul>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('search-modal')">Fechar</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="payload-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Novo Item</h2>
+                <button class="modal-close" onclick="closeModal('payload-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-top: 20px; background: var(--bg-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 2px dashed var(--border-color);">
+                    <pre id="payload-content"></pre>
+                </div>
+            </div>
+            <div class="modal-footer">
+				<button onclick="copyPayload()" class="btn btn-secondary">
+                    📋 Copiar JSON
+                </button>
+                <button class="btn btn-outline" onclick="closeModal('payload-modal')">Cancelar</button>
             </div>
         </div>
     </div>

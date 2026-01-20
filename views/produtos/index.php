@@ -38,7 +38,23 @@
     </form>
 
 </div>
+<?php if ($info = $this->getFlash('info')): ?>
+    <div class="alert alert-info">
+        <?= htmlspecialchars($info) ?>
+    </div>
+<?php endif; ?>
 
+<?php if ($error = $this->getFlash('error')): ?>
+    <div class="alert alert-danger">
+        <?= htmlspecialchars($error) ?>
+    </div>
+<?php endif; ?>
+
+<?php if ($success = $this->getFlash('success')): ?>
+    <div class="alert alert-success">
+        <?= htmlspecialchars($success) ?>
+    </div>
+<?php endif; ?>
 <section class="data-table-container">
     <div class="table-responsive">
         <table class="table table-hover">

@@ -81,6 +81,70 @@ return [
     ],
 
     [
+        'id' => 'estoque',
+        'label' => 'Estoque',
+        'icon'  => '🏷️',
+        'children' => [
+
+            [
+                'group' => 'Movimentação',
+                'items' => [
+                    [
+                        'icon' => '🛠️',
+                        'label' => 'Ajuste de Estoque',
+                        'route' => '/estoque/ajuste',
+                        'permission' => 'ajustar_estoque.create',
+                    ],
+                ],
+            ],
+
+            [
+                'group' => 'Consultas',
+                'items' => [
+                    [
+                        'icon' => '📊',
+                        'label' => 'Saldo por Produto',
+                        'route' => '/estoque/saldos',
+                        'permission' => 'estoque.saldo.view',
+                    ],
+                    [
+                        'icon' => '🏷️',
+                        'label' => 'Lotes',
+                        'route' => '/estoque/lotes',
+                        'permission' => 'estoque.lotes.view',
+                    ],
+                    [
+                        'icon' => '🧾',
+                        'label' => 'Kardex',
+                        'route' => '/estoque/kardex',
+                        'permission' => 'estoque.kardex.view',
+                    ],
+                ],
+            ],
+        ],
+    ],
+    [
+        'id' => 'sincronizacao',
+        'icon' => '🔄',
+        'label' => 'Sincronização',
+        'route' => '/sync',
+        'permission' => 'sync.view',
+        'children' => [
+            [
+                'icon' => '⚙️',
+                'label' => 'Listagem',
+                'route' => '/sync',
+                'permission' => 'sync.view',
+            ],
+            [
+                'icon' => '📈',
+                'label' => 'Status',
+                'route' => '/sync/status',
+                'permission' => 'sync.status.view',
+            ],
+        ],
+    ],
+    [
         'id' => 'auditoria',
         'label' => 'Auditoria',
         'icon'  => '🧾',
