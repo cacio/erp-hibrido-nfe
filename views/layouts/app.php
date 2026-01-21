@@ -9,7 +9,7 @@ use App\Services\MenuService; ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Dashboard' ?> - ERP Híbrido</title>
-    <link rel="stylesheet" href="/css/style.css?v=1.0.0.8">
+    <link rel="stylesheet" href="/css/style.css?v=1.0.1.1">
 </head>
 
 <body>
@@ -65,7 +65,7 @@ use App\Services\MenuService; ?>
         <!-- Mini Sidebar -->
         <aside class="mini-sidebar">
             <div class="mini-logo">
-                <div class="logo-box">M</div>
+                <div class="logo-box">C</div>
             </div>
             <nav class="mini-nav">
                 <?php foreach ($menu as $item): ?>
@@ -87,7 +87,7 @@ use App\Services\MenuService; ?>
                 </div>
             </nav>
             <div class="mini-footer">
-                <div class="mini-avatar">U</div>
+                <div class="mini-avatar">C</div>
             </div>
         </aside>
 
@@ -151,7 +151,7 @@ use App\Services\MenuService; ?>
                     <button id="theme-toggle" class="action-btn">🌙</button>
                     <!-- Profile Dropdown -->
 
-                    <div class="profile-dropdown-container">
+                    <div class="profile-dropdown-container profile-dropdown-actions">
                         <div class="user-profile" id="profile-trigger">
                             <div class="user-meta">
                                 <span class="user-name-top"><?= $this->user->getNome() ?></span>
@@ -187,17 +187,7 @@ use App\Services\MenuService; ?>
                                     </div>
                                 </div>
                             <?php endif; ?>
-                            <div class="dropdown-divider"></div>
-                            <ul class="dropdown-menu">
-                                <li><a href="user_roles.html"><span class="icon">⚙️</span> Settings</a></li>
-                                <li><a href="permissions.html"><span class="icon">🔒</span> Security</a></li>
-                            </ul>
-                            <div class="dropdown-divider"></div>
-                            <ul class="dropdown-menu">
-                                <li><a href="team-panel"><span class="icon">👥</span> Teams</a></li>
-                                <li><a href="#"><span class="icon">💎</span> Subscriptions</a></li>
-                                <li><a href="#"><span class="icon">🎁</span> Referrals</a></li>
-                            </ul>
+
                             <div class="dropdown-divider"></div>
                             <div class="dropdown-item-flex">
                                 <div style="display: flex; align-items: center; gap: 10px;">
@@ -210,7 +200,7 @@ use App\Services\MenuService; ?>
                             </div>
                             <div class="dropdown-divider"></div>
                             <ul class="dropdown-menu">
-                                <li><a href="login.html" style="color: #ef4444;"><span class="icon">🚪</span> Log out</a></li>
+                                <li><a href="/logout" style="color: #ef4444;"><span class="icon">🚪</span> Sair</a></li>
                             </ul>
                         </div>
                     </div>

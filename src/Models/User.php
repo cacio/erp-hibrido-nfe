@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: 'sis_usuarios')]
 class User
 {
@@ -38,7 +39,20 @@ class User
     )]
     private Collection $filiais;
 
+     #[ORM\PrePersist]
+    public function onCreate(): void
+    {
+        $now = new \DateTime();
 
+        $this->created_at = $now;
+        $this->updated_at = $now;
+    }
+
+    #[ORM\PreUpdate]
+    public function onUpdate(): void
+    {
+        $this->updated_at = new \DateTime();
+    }
 
     #[ORM\Column(type: 'string', length: 150, unique: true)]
     private string $email;

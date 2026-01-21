@@ -5,12 +5,31 @@ namespace App\Services;
 use App\Core\EntityManagerFactory;
 use App\Models\Role;
 use App\Models\Permission;
+use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
 
 class RoleAdminService
 {
+    private EntityManagerInterface $em;
+    public function __construct()
+    {
+        $this->em = EntityManagerFactory::create();
+    }
     public function all(): array
     {
+        $qb = EntityManagerFactory::create()
+            ->createQueryBuilder()
+            ->select('p')
+            ->orderBy('p.nome', 'ASC')
+            ->from(Role::class, 'p')
+        ;
+
+        // 🔢 TOTAL
+        $total = (clone $qb)
+            ->select('COUNT(p.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
         return EntityManagerFactory::create()
             ->getRepository(Role::class)
             ->findBy([], ['nome' => 'ASC']);

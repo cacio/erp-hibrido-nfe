@@ -79,7 +79,8 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('GET',  '/admin/filiais/{id}/edit',      'AdminFilialController@edit');
     $r->addRoute('POST', '/admin/filiais/{id}/update',    'AdminFilialController@update');
     $r->addRoute('GET',  '/admin/filiais/{id}/delete',    'AdminFilialController@delete');
-
+    $r->addRoute('GET',  '/admin/filiais/{id}/nfe',       'FilialNfeController@edit');
+    $r->addRoute('POST', '/admin/filiais/{id}/nfe',       'FilialNfeController@update');
     // Gerenciar roles do usuário na filial (GET = tela)
     $r->addRoute('GET','/admin/filiais/{filialId}/usuarios/{userId}/roles','AdminFilialAccessController@roles');
 

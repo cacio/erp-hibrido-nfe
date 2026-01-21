@@ -55,7 +55,7 @@
         <div class="stat-card" style="padding: 20px; border-top: 4px solid var(--primary-color);">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
                 <h4 style="font-size: 18px; font-weight: 700;"><?= htmlspecialchars($role->getNome()) ?></h4>
-                <span class="badge badge-info">Total: 3</span>
+                <span class="badge badge-info">Total: <?= count($role->getPermissions()) ?></span>
             </div>
 
             <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 20px;">

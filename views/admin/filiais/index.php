@@ -89,6 +89,7 @@
                                 <a href="/admin/filiais/<?= $f->getId() ?>/delete"" class=" btn btn-ghost" style="padding: 5px 10px; color: #ef4444;" onclick="return confirm('Remover?')">Remover</a>
                             <?php endif; ?>
                             <a href="/admin/filiais/<?= $f->getId() ?>/acessos" class="btn btn-ghost" style="padding: 5px 10px; color: var(--text-muted);">Acessos</a>
+                            <a href="/admin/filiais/<?= $f->getId() ?>/nfe" class="btn btn-ghost" style="padding: 5px 10px; color: var(--text-muted);">Configuração</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

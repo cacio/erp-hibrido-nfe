@@ -77,4 +77,14 @@ class AdminFilialController extends Controller
 
         $this->redirect('/admin/filiais');
     }
+
+    public function configNfe(string $id)
+    {
+        Authorize::authorize('admin.filiais');
+        $filial = $this->service->find($id);
+
+        $this->render('admin/filiais/nfe_config', [
+            'filial' => $filial,
+        ]);
+    }
 }

@@ -115,13 +115,28 @@ class Filial
 
     public function getConfigNfe(): ?array
     {
-        return $this->config_nfe;
+        return $this->config_nfe ?? [];
     }
 
-    public function getTipoUnidade():string{
+    public function getTipoUnidade(): string
+    {
         return $this->tipo_unidade;
     }
 
+    public function getAmbienteNfe(): string
+    {
+        return $this->config_nfe['ambiente'] ?? 'HOMOLOGACAO';
+    }
+
+    public function getUltimoNumeroNfe(): int
+    {
+        return $this->config_nfe['numeracao']['nfe']['ultimo_numero'] ?? 0;
+    }
+
+    public function setConfigNfe(array $config): void
+    {
+        $this->config_nfe = $config;
+    }
 
     public function setId(string $id): void
     {
