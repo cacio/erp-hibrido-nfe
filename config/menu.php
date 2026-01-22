@@ -79,6 +79,24 @@ return [
             ],
         ],
     ],
+    [
+        'id'=>'Financeiro',
+        'label'=>'Financeiro',
+        'icon'=>'💰',
+        'children'=>[
+            [
+                'group'=>'Contas a Pagar e Receber',
+                'items'=>[
+                    [
+                        'icon'=>'📋',
+                        'label'=>'Contas a Pagar e Receber',
+                        'route'=>'/financeiro',
+                        'permission'=>'financeiro.view',
+                    ],
+                ],
+            ],
+        ],
+    ],
 
     [
         'id' => 'estoque',

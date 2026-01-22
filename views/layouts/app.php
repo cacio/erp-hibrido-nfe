@@ -9,7 +9,8 @@ use App\Services\MenuService; ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Dashboard' ?> - ERP Híbrido</title>
-    <link rel="stylesheet" href="/css/style.css?v=1.0.1.1">
+    <link rel="stylesheet" href="/css/style.css?v=1.0.1.2">
+    <script src="https://unpkg.com/imask"></script>
 </head>
 
 <body>
@@ -54,7 +55,7 @@ use App\Services\MenuService; ?>
                 </div>
             </div>
             <div class="modal-footer">
-				<button onclick="copyPayload()" class="btn btn-secondary">
+                <button onclick="copyPayload()" class="btn btn-secondary">
                     📋 Copiar JSON
                 </button>
                 <button class="btn btn-outline" onclick="closeModal('payload-modal')">Cancelar</button>
@@ -144,6 +145,7 @@ use App\Services\MenuService; ?>
                 <div class="top-bar-header">
                     <button class="action-btn" id="menu-toggle" style="margin-right: 10px;">☰</button>
                     <h2><?= $titletopbar ?></h2>
+                    <p><?= APP_VERSION ?></p>
                 </div>
                 <div class="top-bar-actions">
                     <button class="action-btn" onclick="openModal('search-modal')" title="Busca Global">🔍</button>
@@ -213,6 +215,7 @@ use App\Services\MenuService; ?>
 
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script src="/js/dashboard.js?v=1.0.6"></script>
 </body>
 

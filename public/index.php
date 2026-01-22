@@ -1,11 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 // /public/index.php
 
 session_start();
 
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../config/database.php';
+
+use FastRoute\Dispatcher;
+use App\Controllers\ErrorController;
+use App\Core\Logger;
+
+/**
+ * =========================
+ * MODO MANUTENÇÃO
+ * =========================
+ */
+if (
+    file_exists(__DIR__ . '/../storage/maintenance.lock')
+    && !str_starts_with($_SERVER['REQUEST_URI'], '/api')
+) {
+    http_response_code(503);
+    require __DIR__ . '/../views/errors/503.php';
+    exit;
+}
+
+/**
+ * =========================
+ * Normalização da URI
+ * =========================
+ */
+$httpMethod = $_SERVER['REQUEST_METHOD'];
 
 /**
  * URI normalizada (ANTES de qualquer uso)
@@ -25,6 +52,13 @@ if (!file_exists(__DIR__ . '/../storage/installed.lock')) {
         exit;
     }
 }
+
+/**
+ * =========================
+ * Dispatch
+ * =========================
+ */
+
 // 1. Inicializa o despachante de rotas do FastRoute
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
 
@@ -127,6 +161,25 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->post('/sync/reprocessar', 'SyncDashboardController@reprocessar');
     $r->get('/sync/payload', 'SyncDashboardController@payload');
 
+    $r->addRoute('GET',  '/financeiro',        'FinanceiroController@index');
+    $r->addRoute('GET',  '/financeiro/create', 'FinanceiroController@create');
+    $r->addRoute('POST', '/financeiro',        'FinanceiroController@store');
+
+    $r->addRoute('POST', '/financeiro/{id}/pagar',   'FinanceiroController@pagar');
+    $r->addRoute('POST', '/financeiro/{id}/cancelar','FinanceiroController@cancelar');
+
+    $r->addRoute('GET', '/api/participantes/search', 'Api\\ParticipanteSearchController@search');
+    $r->addRoute('GET', '/api/planos/search', 'Api\\PlanoContaSearchController@search');
+
+    //GET /financeiro/detalhes/{id}
+    $r->addRoute('GET', '/financeiro/detalhes/{id}', 'FinanceiroController@detalhes');
+    //POST /financeiro/baixa/{id}
+    $r->addRoute('POST', '/financeiro/baixa/{id}', 'FinanceiroController@baixaRapida');
+    //POST /financeiro/baixa-lote
+    $r->addRoute('POST', '/financeiro/baixa-lote', 'FinanceiroController@baixaLote');
+
+    //POST /financeiro/baixa-lote/preview
+    $r->addRoute('POST', '/financeiro/baixa-lote/preview', 'FinanceiroController@previewBaixaLote');
 
     // Exemplo de rota com parâmetro: buscar um usuário por ID
     // O {id:\d+} garante que o ID seja um ou mais dígitos numéricos
@@ -143,48 +196,47 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
 
 });
 
-// 2. Busca o método HTTP e a URI da requisição
-$httpMethod = $_SERVER['REQUEST_METHOD'];
-$uri = $_SERVER['REQUEST_URI'];
+$routeInfo = $dispatcher->dispatch($httpMethod, $uri);
 
-// Remove a query string (ex: ?foo=bar ) da URI
-if (false !== $pos = strpos($uri, '?')) {
-    $uri = substr($uri, 0, $pos);
-}
-$uri = rawurldecode($uri);
+/**
+ * =========================
+ * Tratamento de erros
+ * =========================
+ */
+$errorController = new ErrorController();
 
-// 3. Despacha a rota
-$routeInfo = $dispatcher->dispatch($httpMethod, $uri );
-
-// 4. Trata o resultado do despacho
 switch ($routeInfo[0]) {
-    case FastRoute\Dispatcher::NOT_FOUND:
-        // ... Lógica para erro 404
-        http_response_code(404 );
-        echo "Página não encontrada (404).";
+
+    case Dispatcher::NOT_FOUND:
+        $errorController->notFound();
         break;
 
-    case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-        // ... Lógica para erro 405
-        $allowedMethods = $routeInfo[1];
-        http_response_code(405 );
-        echo "Método não permitido (405).";
+    case Dispatcher::METHOD_NOT_ALLOWED:
+        $errorController->methodNotAllowed($routeInfo[1]);
         break;
 
-    case FastRoute\Dispatcher::FOUND:
-        $handler = $routeInfo[1]; // 'SeuController@seuMetodo'
-        $vars = $routeInfo[2];    // Parâmetros da rota (ex: ['id' => '123'])
+    case Dispatcher::FOUND:
+        $handler = $routeInfo[1];
+        $vars    = $routeInfo[2];
 
-        list($controller, $method) = explode('@', $handler);
+        [$controller, $method] = explode('@', $handler);
         $controller = "App\\Controllers\\{$controller}";
 
-        if (class_exists($controller) && method_exists($controller, $method)) {
-            $controllerInstance = new $controller();
-            // Passa os parâmetros da rota para o método do controller
-            call_user_func_array([$controllerInstance, $method], $vars);
-        } else {
-            http_response_code(500 );
-            echo "Erro interno: Controller ou método não encontrado.";
+        try {
+            if (!class_exists($controller) || !method_exists($controller, $method)) {
+                throw new RuntimeException('Controller ou método não encontrado');
+            }
+
+            $instance = new $controller();
+            call_user_func_array([$instance, $method], $vars);
+
+        } catch (Throwable $e) {
+            Logger::error($e);
+            $errorController->internalError();
         }
+
         break;
+
+    default:
+        $errorController->internalError();
 }

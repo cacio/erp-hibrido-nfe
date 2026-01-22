@@ -35,15 +35,14 @@ abstract class Controller
 
     protected function render(string $view, array $data = []): void
     {
-        $viewPath = dirname(__DIR__, 2) . '/views/' . $view . '.php';
+        extract($data);
+
+        $viewPath = __DIR__ . "/../../views/{$view}.php";
 
         if (!file_exists($viewPath)) {
-            http_response_code(500);
-            echo "View não encontrada: {$viewPath}";
-            exit;
+            throw new \RuntimeException("View não encontrada: {$view}");
         }
 
-        extract($data);
         require $viewPath;
     }
 

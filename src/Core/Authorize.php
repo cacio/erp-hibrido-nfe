@@ -19,8 +19,7 @@ class Authorize
             http_response_code(403);
 
             if (php_sapi_name() !== 'cli') {
-                echo '<h1>403 - Acesso negado</h1>';
-                echo '<p>Você não tem permissão para acessar esta funcionalidade.</p>';
+                require __DIR__ . '/../../views/errors/403.php';
             }
 
             exit;
