@@ -70,3 +70,4 @@ phpunit.xml
 *.bak
 *.backup
 *.dump
+/config/version.php

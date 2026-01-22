@@ -145,7 +145,7 @@ use App\Services\MenuService; ?>
                 <div class="top-bar-header">
                     <button class="action-btn" id="menu-toggle" style="margin-right: 10px;">☰</button>
                     <h2><?= $titletopbar ?></h2>
-                    <p><?= APP_VERSION ?></p>
+                    <p> Versão: <?= APP_VERSION ?></p>
                 </div>
                 <div class="top-bar-actions">
                     <button class="action-btn" onclick="openModal('search-modal')" title="Busca Global">🔍</button>

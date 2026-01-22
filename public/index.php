@@ -9,6 +9,13 @@ session_start();
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../config/database.php';
 
+if (file_exists(__DIR__ . '/config/version.php')) {
+    require __DIR__ . '/config/version.php';
+} else {
+    define('APP_VERSION', 'dev');
+}
+
+
 use FastRoute\Dispatcher;
 use App\Controllers\ErrorController;
 use App\Core\Logger;
