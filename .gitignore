@@ -70,4 +70,7 @@ phpunit.xml
 *.bak
 *.backup
 *.dump
+<<<<<<< HEAD
 /config/version.php
+=======
+>>>>>>> 42446163d85696c8b224a42684a04a4ebb57d7ef
