@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(columns: ['tenant_id'], name: 'idx_participantes_tenant')]
 #[ORM\Index(columns: ['cpf_cnpj'], name: 'idx_participantes_cpf_cnpj')]
 #[ORM\Index(columns: ['tipo_cadastro'], name: 'idx_participantes_tipo')]
-#[ORM\UniqueConstraint(columns: ['tenant_id', 'cpf_cnpj'], name: 'idx_participantes_tenant_doc')]
+// #[ORM\UniqueConstraint(columns: ['tenant_id', 'cpf_cnpj'], name: 'idx_participantes_tenant_doc')]
 class Participante
 {
     #[ORM\Id]

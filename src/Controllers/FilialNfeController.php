@@ -56,6 +56,9 @@ class FilialNfeController extends Controller
                 'ultimo_numero'  => (int) ($_POST['ultimo_numero'] ?? 0),
             ];
 
+            // Permitir documento duplicado
+            $config['participante']['permitir_documento_duplicado'] = isset($_POST['permitir_documento_duplicado']) ? true : false;
+
             // Upload certificado
             if (!empty($_FILES['certificado']['tmp_name'])) {
                 $dir = defined('BASE_PATH') ? BASE_PATH . '/storage/certificados' : dirname(dirname(__DIR__)) . '/storage/certificados';

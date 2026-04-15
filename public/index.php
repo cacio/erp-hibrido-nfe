@@ -133,6 +133,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('GET',  '/participantes/buscar-doc',  'ParticipanteController@buscarDocumento');
     $r->addRoute('GET','/participantes/buscar-cnpj-externo', 'ParticipanteController@buscarCnpjExterno');
     $r->addRoute('GET','/enderecos/buscar-cep','ParticipanteController@buscarCep');
+    $r->addRoute('GET', '/api/cep/{cep}','CepController@buscar');
 
     /* Rotas de Produtos */
     $r->addRoute('GET',  '/produtos',                'ProdutoController@index');

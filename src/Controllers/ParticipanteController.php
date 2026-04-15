@@ -29,14 +29,17 @@ class ParticipanteController extends Controller
     // =========================
     public function index(): void
     {
-        $tenantId = $_SESSION['auth']['tenant_id'];
 
         Authorize::authorize('cadastro.participantes.view');
+
+        $tenantId = $_SESSION['auth']['tenant_id'];
 
         $pagina = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
         $q      = $_GET['q'] ?? '';
         $tipo   = $_GET['tipo'] ?? '';
         $ativo  = $_GET['ativo'] ?? '1';
+        $nome_razao = $_GET['nome_razao'] ?? '';
+        $filterdocumento = $_GET['filter-documento'] ?? '';
 
         $resultado = $this->service->buscarPaginado(
             $tenantId,
@@ -44,6 +47,8 @@ class ParticipanteController extends Controller
                 'q'    => $q,
                 'tipo' => $tipo,
                 'ativo' => $ativo,
+                'nome_razao'=> $nome_razao,
+                'filter-documento' => $filterdocumento,
             ],
             $pagina,
             20
@@ -131,6 +136,7 @@ class ParticipanteController extends Controller
 
         try {
 
+
             $this->service->atualizar($participante, $dados);
 
             $this->flash('success', 'Participante atualizado com sucesso.');
@@ -155,28 +161,31 @@ class ParticipanteController extends Controller
             return;
         }
 
-        $participante = $this->service
+        $participantes = $this->service
             ->buscarPorDocumento($tenantId, $doc);
 
         header('Content-Type: application/json');
 
-        if (!$participante) {
-            echo json_encode(null);
+        if (!$participantes['participante']) {
+            echo json_encode([
+                'cadastro_duplicar' => $participantes['duplicar'] ? true : false,
+            ]);
             return;
         }
 
         echo json_encode([
-            'id'            => $participante->getId(),
-            'cpf_cnpj'      => $participante->getCpfCnpj(),
-            'nome_razao'    => $participante->getNomeRazao(),
-            'nome_fantasia' => $participante->getNomeFantasia(),
-            'tipo_cadastro' => $participante->getTipoCadastro(),
-            'ind_iedest'    => $participante->getIndIeDest(),
-            'ie'            => $participante->getIe(),
-            'telefone'      => $participante->getTelefone(),
-            'email'         => $participante->getEmail(),
-            'enderecos'     => $participante->getEnderecoJson(),
-            'ativo'         => $participante->isAtivo()
+            'id'            => $participantes['participante']->getId(),
+            'cpf_cnpj'      => $participantes['participante']->getCpfCnpj(),
+            'nome_razao'    => $participantes['participante']->getNomeRazao(),
+            'nome_fantasia' => $participantes['participante']->getNomeFantasia(),
+            'tipo_cadastro' => $participantes['participante']->getTipoCadastro(),
+            'ind_iedest'    => $participantes['participante']->getIndIeDest(),
+            'ie'            => $participantes['participante']->getIe(),
+            'telefone'      => $participantes['participante']->getTelefone(),
+            'email'         => $participantes['participante']->getEmail(),
+            'enderecos'     => $participantes['participante']->getEnderecoJson(),
+            'ativo'         => $participantes['participante']->isAtivo(),
+            'cadastro_duplicar' => $participantes['duplicar'] ? true : false,
         ]);
     }
 

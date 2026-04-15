@@ -241,6 +241,10 @@ document.addEventListener('DOMContentLoaded', () => {
 document.getElementById('close-sidebar').addEventListener('click', () => {
     detailSidebar.classList.remove('open');
     dashboardContainer.classList.add('sidebar-collapsed');
+    setTimeout(() => {
+        table.redraw(true);
+        table.setColumns(table.getColumnDefinitions());
+    }, 300);
 });
 
 document.getElementById('menu-toggle').addEventListener('click', () => {
@@ -416,5 +420,6 @@ function updateChartsTheme() {
         }
     });
 }
-
-initCharts();
+if (document.getElementById('salesChart')) {
+    initCharts();
+}

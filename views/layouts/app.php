@@ -9,10 +9,14 @@ use App\Services\MenuService; ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Dashboard' ?> - ERP Híbrido</title>
-    <link rel="stylesheet" href="/css/style.css?v=1.0.1.7">
+    <link rel="stylesheet" href="/css/style.css?v=1.0.4.">
     <script src="https://unpkg.com/imask"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href='https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdn.boxicons.com/transformations.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/winbox@0.2.82/dist/css/winbox.min.css">
+    <link rel="stylesheet" href="/css/plugins/tabulator/tabulator_modern.min.css">
+    <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_dark.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -220,7 +224,11 @@ use App\Services\MenuService; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/winbox@0.2.82/dist/winbox.bundle.min.js"></script>
-    <script src="/js/dashboard.js?v=1.1.1"></script>
+    <script src="/js/plugins/xlsx.full.min.js"></script>
+    <script src="/js/plugins/jspdf.umd.min.js"></script>
+    <script src="/js/plugins/jspdf.plugin.autotable.min.js"></script>
+    <script src="/js/plugins/tabulator.min.js"></script>
+    <script src="/js/dashboard.js?v=1.1.5"></script>
 </body>
 
 </html>

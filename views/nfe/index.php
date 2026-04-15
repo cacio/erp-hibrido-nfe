@@ -9,7 +9,7 @@
     </div>
     <div class="filter-actions">
         <button class="btn btn-secondary"><i class="fa fa-file-export"></i> Exportar</button>
-      <a href="/nfe/create" class="btn btn-primary">+ Nova NF-e</a>
+        <a href="/nfe/create" class="btn btn-primary">+ Nova NF-e</a>
     </div>
 </div>
 

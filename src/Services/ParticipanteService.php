@@ -9,9 +9,13 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class ParticipanteService
 {
+    private ConfigService $configService;
+
     public function __construct(
         private EntityManagerInterface $em
-    ) {}
+    ) {
+        $this->configService = new ConfigService($em);
+    }
 
     // =========================
     // BUSCAS
@@ -20,14 +24,20 @@ class ParticipanteService
     public function buscarPorDocumento(
         string $tenantId,
         string $cpfCnpj
-    ): ?Participante {
+    ): ?array {
         $doc = $this->normalizarDocumento($cpfCnpj);
 
-        return $this->em->getRepository(Participante::class)
+        $docdupli = $this->configService->permitirDocumentoDuplicado();
+        $participante = $this->em->getRepository(Participante::class)
             ->findOneBy([
                 'tenantId' => $tenantId,
                 'cpfCnpj'  => $doc
             ]);
+
+        return [
+            'participante' => $participante,
+            'duplicar'    =>  $docdupli,
+        ];
     }
 
     public function buscarPaginado(
@@ -54,11 +64,23 @@ class ParticipanteService
                 ->setParameter('tipo', '%' . $filtros['tipo'] . '%');
         }
 
-        if(isset($filtros['ativo'])) {
+        if (isset($filtros['ativo'])) {
             $qb->andWhere('p.ativo = :ativo')
                 ->setParameter('ativo', (bool) $filtros['ativo']);
         }
 
+        if(!empty($filtros['filter-documento'])) {
+            $doc = $this->normalizarDocumento($filtros['filter-documento']);
+            $qb->andWhere('p.cpfCnpj LIKE :cpfcnpj')
+                ->setParameter('cpfcnpj', '%' . $doc . '%');
+        }
+
+         if (!empty($filtros['nome_razao'])) {
+            $qb->andWhere(
+                'p.nomeRazao LIKE :q OR p.nomeFantasia LIKE :q'
+            )->setParameter('q', '%' . $filtros['q'] . '%');
+        }
+        //nome_razao
 
         $qb->setFirstResult(($pagina - 1) * $limite)
             ->setMaxResults($limite);
@@ -83,18 +105,21 @@ class ParticipanteService
         array $dados
     ): Participante {
 
+
         if (!empty($dados['cpf_cnpj'])) {
             $existente = $this->buscarPorDocumento(
                 $tenantId,
                 $dados['cpf_cnpj']
             );
 
-            if ($existente) {
+            if ($existente && !$this->configService->permitirDocumentoDuplicado()) {
                 throw new \DomainException(
                     'Já existe um participante com este CPF/CNPJ.'
                 );
             }
         }
+
+        $this->validarIE($dados);
 
         $participante = new Participante(
             Uuid::uuid4()->toString(),
@@ -188,6 +213,8 @@ class ParticipanteService
 
         if (array_key_exists('ativo', $dados)) {
             $p->setAtivo((bool) $dados['ativo']);
+        }else{
+            $p->setAtivo(false);
         }
 
         if (!empty($dados['enderecos'])) {
@@ -257,5 +284,33 @@ class ParticipanteService
                 ],
                 ['nomeRazao' => 'ASC']
             );
+    }
+
+    private function validarIE(array $dados): void
+    {
+        $indIEDest = (string) ($dados['ind_iedest'] ?? '');
+        $ie        = trim($dados['ie'] ?? '');
+
+        // 🔴 Contribuinte → IE obrigatória
+        if ($indIEDest === '1') {
+            if (empty($ie)) {
+                throw new \DomainException('Inscrição Estadual é obrigatória para contribuinte ICMS.');
+            }
+        }
+
+        // 🟡 Isento
+        if ($indIEDest === '2') {
+            // pode deixar vazio ou "ISENTO"
+            if (!empty($ie) && strtoupper($ie) !== 'ISENTO') {
+                throw new \DomainException('Para isento, informe "ISENTO" ou deixe em branco.');
+            }
+        }
+
+        // ⚫ Não contribuinte
+        if ($indIEDest === '9') {
+            if (!empty($ie)) {
+                throw new \DomainException('Não contribuinte não deve possuir Inscrição Estadual.');
+            }
+        }
     }
 }
